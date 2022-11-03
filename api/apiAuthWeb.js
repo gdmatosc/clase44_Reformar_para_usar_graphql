@@ -114,6 +114,11 @@ class ApiAuth{
         return {username}
     }
 
+    getProveedoresAdmin(username){
+        logr.debug('[getProveedoresAdmin]',{recurso:'[na]'})
+        return {username}
+    }
+
     getOperacionesRandoms(username){
         logr.debug('[getOperacionesRandoms]',{recurso:'[na]'})
         return {username}

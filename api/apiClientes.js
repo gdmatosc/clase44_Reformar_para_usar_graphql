@@ -104,6 +104,25 @@ class ApiClientes{
 
     /* #endregion */
 
+    /* #region. 5.Proveedores*/
+    async obtenerProveedoresTodos(){
+        logr.debug('obtenerProveedoresTodos()',{recurso:'[na]'})
+        return await DAO.proveedoresGeneral.getAll();
+    }
+    
+    async guardarProveedores(dataBody){
+        logr.debug('guardarProveedores',{recurso:'[na]'})
+        dataBody.telefono=dataBody.telefono;
+        return await DAO.proveedoresGeneral.save(dataBody)
+    }
+    
+    async borrarProveedor(id){
+        logr.debug('borrarProveedor',{recurso:'[na]'})
+        await DAO.proveedoresGeneral.deleteById(id)
+        return {message:`El producto con id ${id} de un file se borró exitosamente`}
+    }
+    /* #endregion */
+
     static asegurarObjetoValida(objeto,requerido){
         try{
             Productos.validar(objeto,requerido)

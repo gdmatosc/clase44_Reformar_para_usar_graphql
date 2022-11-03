@@ -22,6 +22,10 @@ class RouterClientes{
         router.delete('/objetos',this.controllerClientes.borrarObjetosTodos)
         router.delete('/objetos/:id',this.controllerClientes.borrarObjeto)
 
+        router.get('/proveedores',this.controllerClientes.obtenerProveedoresTodos)
+        router.post('/proveedores',this.controllerClientes.guardarProveedores)
+        router.delete('/proveedores/:id',this.controllerClientes.borrarProveedor)
+
         router.get('/objetosCarrito',this.controllerClientes.obtenerObjetosCarritosTodos)
         router.get('/objetosCarrito/:id',this.controllerClientes.obtenerObjetosCarrito)
         router.post('/objetosCarrito/:id/objetos',this.controllerClientes.guardarObjetosCarrito)

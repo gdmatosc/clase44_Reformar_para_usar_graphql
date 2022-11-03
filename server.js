@@ -5,6 +5,9 @@
 /* #endregion */ 
 
 const express=require('express');
+const {graphqlHTTP}=require('express-graphql')
+const {buildSchema}=require('graphql')
+const crypto=require('crypto')
 const session=require('express-session')
 const app=express();
 const fs=require('fs')
@@ -36,6 +39,8 @@ const RouterAuth=require('./routes/routerAuthWeb')
 const routerAuth=new RouterAuth()
 const RouterClientes=require('./routes/routerClientes')
 const routerClientes=new RouterClientes()
+const graphqlSchema=require('./api/graphql/schema')
+const graphqlResolvers=require('./controller/controllerProveedoresResolvers')
 const fnCom=require('./api/funciones_adicionales/comunicaciones')
 const { Server }=require("socket.io")
 
@@ -51,7 +56,8 @@ const passport=require('./model/passportAuth')
 
 const path = require('path')
 
-const UsersModel=require('./model/models/user.model')
+const UsersModel=require('./model/models/user.model');
+const { schema } = require('./model/models/user.model');
 
 //const process_PORT=parseInt(process.argv[2]) || 8081;
 //const process_PORT=8081;
@@ -184,7 +190,96 @@ app.set('view engine','ejs')
 /* #endregion */ 
 
 /* #region. 4.Passport con enrutamiento*/
+//graphql
+
+
+app.use('/graphql',graphqlHTTP({
+    schema:graphqlSchema,
+    rootValue:graphqlResolvers,
+    graphiql: true,
+}))
+
 //4.1.Configuración de passport
+
+
+
+
+app.use(session({
+    secret:'secret',
+    resave:false,
+    saveUninitialized:false,
+    rolling:true,
+    cookie:{
+        maxAge:60000,
+        secure:false,
+        httpOnly:true
+    }
+}))
+
+app.use(passport.inicioAuth)
+app.use(passport.sesionAuth)
+
+/* #endregion */ 
+
+/* #region. 5.Enrutamiento de autenticación y autorización*/
+
+//5.1.Rutas de autenticación
+app.use('/',routerAuth.start())
+app.use('/login',routerAuth.start())
+
+app.get('/signup',routerAuth.start())
+app.post('/signup',routerAuth.start())
+app.get('/user_data', routerAuth.start())
+app.get('/failsignup',routerAuth.start())
+app.get('/faillogin',routerAuth.start())
+
+//5.2.Rutas de autorización
+
+app.use('/logout',routerAuth.start())
+//app.use('/private',routerAuth.start())
+app.use('/homeGeneral',routerAuth.start())
+app.use('/userProfile',routerAuth.start())
+app.use('chatGeneral',routerAuth.start())
+app.use('productosClientes',routerAuth.start())
+app.use('/carritoClientes',routerAuth.start())
+app.use('/homeAdmin',routerAuth.start())
+app.use('/compraExitosa',routerAuth.start())
+app.use('/productosMantenimiento',routerAuth.start())
+app.use('/proveedoresAdmin',routerAuth.start())
+app.use('/operaciones/randoms',routerAuth.start())
+app.use('/operaciones/info',routerAuth.start())
+app.use('/api/uploadFile',routerAuth.start())
+app.use('*',routerAuth.start())
+
+/* #endregion */ 
+
+/* #region. 6.Validación de logging*/
+//let datoL='Ok'
+//const childLogger=logger.child({modulo:'b0.server.js'})
+const loger=logd.child({modulo:`${modname}[Pruebas]`})
+loger.info('Test Info message',{recurso:'[na]'});
+loger.debug(`Test Debug: ${JSON.stringify({
+    cookie: {path: '/',_expires: '2022-09-30T17:35:03.710Z',originalMaxAge: 60000,httpOnly: true,secure: false},
+    passport: { user: 'yo' } })}`,{recurso:'[na]'});
+loger.verbose('Test Verbose message',{recurso:'[na]'});
+loger.warn(JSON.stringify('Test Warn message'),{recurso:'[na]'});
+loger.error(JSON.stringify('Test Error message'),{recurso:'[na]'});
+//loger.verbose(JSON.stringify('Test Crit message'),{recurso:'[na]'});
+//loger.silly(JSON.stringify('Test Alert message'),{recurso:'[na]'});
+//loger.emerg(JSON.stringify('Test Emerg message'),{recurso:'[na]'});
+
+/* #endregion */ 
+
+/* #region. 7.Iniciando servidor general*/
+server.listen(process_PORT,()=>{
+    logr.info(`Server desplegado en http://127.0.0.1:${process_PORT}`,{recurso:'[listen]'})
+    logr.warn(`PID WORKER ${process.pid}`,{recurso:'[process.pid]'})
+})
+/* #endregion */ 
+
+}
+
+/* #region. Bloc*/
 
 
 // passport.use('login',new LocalStrategy(
@@ -261,82 +356,6 @@ app.set('view engine','ejs')
 //     UsersModel.findById(userId, (err, user) => {return done(err, user)});
 
 // })
-
-app.use(session({
-    secret:'secret',
-    resave:false,
-    saveUninitialized:false,
-    rolling:true,
-    cookie:{
-        maxAge:60000,
-        secure:false,
-        httpOnly:true
-    }
-}))
-
-app.use(passport.inicioAuth)
-app.use(passport.sesionAuth)
-
-/* #endregion */ 
-
-/* #region. 5.Enrutamiento de autenticación y autorización*/
-
-//5.1.Rutas de autenticación
-app.use('/',routerAuth.start())
-app.use('/login',routerAuth.start())
-
-app.get('/signup',routerAuth.start())
-app.post('/signup',routerAuth.start())
-app.get('/user_data', routerAuth.start())
-app.get('/failsignup',routerAuth.start())
-app.get('/faillogin',routerAuth.start())
-
-//5.2.Rutas de autorización
-
-app.use('/logout',routerAuth.start())
-//app.use('/private',routerAuth.start())
-app.use('/homeGeneral',routerAuth.start())
-app.use('/userProfile',routerAuth.start())
-app.use('chatGeneral',routerAuth.start())
-app.use('productosClientes',routerAuth.start())
-app.use('/carritoClientes',routerAuth.start())
-app.use('/homeAdmin',routerAuth.start())
-app.use('/compraExitosa',routerAuth.start())
-app.use('/productosMantenimiento',routerAuth.start())
-app.use('/operaciones/randoms',routerAuth.start())
-app.use('/operaciones/info',routerAuth.start())
-app.use('/api/uploadFile',routerAuth.start())
-app.use('*',routerAuth.start())
-
-/* #endregion */ 
-
-/* #region. 6.Validación de logging*/
-//let datoL='Ok'
-//const childLogger=logger.child({modulo:'b0.server.js'})
-const loger=logd.child({modulo:`${modname}[Pruebas]`})
-loger.info('Test Info message',{recurso:'[na]'});
-loger.debug(`Test Debug: ${JSON.stringify({
-    cookie: {path: '/',_expires: '2022-09-30T17:35:03.710Z',originalMaxAge: 60000,httpOnly: true,secure: false},
-    passport: { user: 'yo' } })}`,{recurso:'[na]'});
-loger.verbose('Test Verbose message',{recurso:'[na]'});
-loger.warn(JSON.stringify('Test Warn message'),{recurso:'[na]'});
-loger.error(JSON.stringify('Test Error message'),{recurso:'[na]'});
-//loger.verbose(JSON.stringify('Test Crit message'),{recurso:'[na]'});
-//loger.silly(JSON.stringify('Test Alert message'),{recurso:'[na]'});
-//loger.emerg(JSON.stringify('Test Emerg message'),{recurso:'[na]'});
-
-/* #endregion */ 
-
-/* #region. 7.Iniciando servidor general*/
-server.listen(process_PORT,()=>{
-    logr.info(`Server desplegado en http://127.0.0.1:${process_PORT}`,{recurso:'[listen]'})
-    logr.warn(`PID WORKER ${process.pid}`,{recurso:'[process.pid]'})
-})
-/* #endregion */ 
-
-}
-
-/* #region. Bloc*/
 
 //app.get('/',apiRouterAuth.getRoot)
 //app.get('/login',apiRouterAuth.getLogin)

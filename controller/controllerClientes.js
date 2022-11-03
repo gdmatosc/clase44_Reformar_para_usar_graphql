@@ -130,6 +130,47 @@ borrarObjetosCarrito=async(req,res)=>{
 
 /* #endregion */
 
+/* #region. 5.Proveedores*/
+
+obtenerProveedoresTodos=async (req, res) => {
+    try{
+        let ProveedoresTodos=await this.apiClientes.obtenerProveedoresTodos() 
+        logr.debug(ProveedoresTodos,{recurso:'[obtenerProveedoresTodos()][ProveedoresTodos]'})
+        //console.log("contenedorVar.ProveedoresFile.RouterGet",contenedorVar)//debug
+        res.json(ProveedoresTodos)
+    }
+    catch(error){
+        logr.warn(error,{recurso:'[obtenerProveedoresTodos()][error]'})
+    }
+    
+}
+
+guardarProveedores=async (req,res)=>{
+    try {
+        let dataBody=req.body;
+        let ProveedoresGuardados=await this.apiClientes.guardarProveedores(dataBody)
+        //console.log("req.bodyPost.ProveedoresFile.RouterPost",req.body) //debug
+        res.send("Guardado.routerProveedoresPostFile")
+    }
+    catch(error){
+        logr.warn(error,{recurso:'[guardarProveedores()][error]'})
+    }
+    
+}
+
+borrarProveedor=async(req,res)=>{
+    try{
+        const {id}=req.params;
+        let proveedorBorrado=await this.apiClientes.borrarProveedor(id)
+        //console.log("req.paramas.apiClientes.delete",req.params)//debug        
+        res.send(proveedorBorrado)
+    }
+    catch(error){
+        logr.warn(error,{recurso:'[borrarProveedor()][error]'})
+    }
+}
+
+/* #endregion */
 
 }
 

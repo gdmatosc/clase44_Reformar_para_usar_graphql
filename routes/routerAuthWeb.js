@@ -24,18 +24,21 @@ class RouterAuth{
         router.get('/failsignup',this.controllerAuth.getFailSignup)
         router.get('/faillogin',this.controllerAuth.getFailLogin)
         router.get('/logout',PassportAuth.checkAuthentication,this.controllerAuth.getLogout)
+
         router.get('/homeGeneral',PassportAuth.checkAuthentication,this.controllerAuth.getHomeGeneral)
         router.get('/userProfile',PassportAuth.checkAuthentication,this.controllerAuth.getUserProfile)
-        
         router.get('/chatGeneral',PassportAuth.checkAuthentication,this.controllerAuth.getChatGeneral)
         router.get('/productosClientes',PassportAuth.checkAuthentication,this.controllerAuth.getProductosClientes)
         router.get('/carritoClientes',PassportAuth.checkAuthentication,this.controllerAuth.getCarritoClientes)
-        router.get('/homeAdmin',PassportAuth.checkAuthentication,this.controllerAuth.getHomeAdmin)
         router.get('/compraExitosa',PassportAuth.checkAuthentication,this.controllerAuth.getCompraExitosa)
+        router.post('/api/uploadFile',PassportAuth.checkAuthentication,this.controllerAuth.postUploadFile)
+
+        router.get('/homeAdmin',PassportAuth.checkAuthentication,this.controllerAuth.getHomeAdmin)
         router.get('/productosMantenimiento',PassportAuth.checkAuthentication,this.controllerAuth.getProductosMantenimiento)
+        router.get('/proveedoresAdmin',PassportAuth.checkAuthentication,this.controllerAuth.getProveedoresAdmin)
         router.get('/operaciones/randoms',PassportAuth.checkAuthentication,this.controllerAuth.getOperacionesRandoms)
         router.get('/operaciones/info',PassportAuth.checkAuthentication,this.controllerAuth.getOperacionesInfo)
-        router.post('/api/uploadFile',PassportAuth.checkAuthentication,this.controllerAuth.postUploadFile)
+        
         router.get('*',PassportAuth.checkAuthentication,this.controllerAuth.getDefault)
         return router
     }

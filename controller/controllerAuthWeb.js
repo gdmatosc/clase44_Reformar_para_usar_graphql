@@ -34,6 +34,7 @@ getLogin=(req,res)=>{
     if(req.isAuthenticated()){
         loger.debug('(inicio if req.isAuthenticated())',{recurso:'[na]'})
         const user=req.user
+        this.usernameLocal=req.user.username
         let username=req.user.username
         let name=req.user.name
         let email=req.user.email
@@ -148,16 +149,16 @@ getChatGeneral=(req,res)=>{
     const loger=logd.child({modulo:`${modname}[get-chatGeneral]`})
     let username=req.user.username
     loger.verbose(username,{recurso:"[username]"})
-    let web= this.apiAuth.getChatGeneral()
+    let web= this.apiAuth.getChatGeneral(username)
     return res.render('chatGeneral.ejs',web)
 }
 
 getProductosClientes=(req,res)=>{
     //logr.verbose(req.session);
     const loger=logd.child({modulo:`${modname}[get-productosClientes]`})
-    let username=req.session.username
+    let username=req.user.username
     loger.verbose(username,{recurso:"[reqSessionUsername]"})
-    let web= this.apiAuth.getProductosClientes()
+    let web= this.apiAuth.getProductosClientes(username)
     return res.render('productosClientes.ejs',web)
     //return res.sendFile(path.resolve(__dirname, '../Clase28.desafio/f1.views')+'/productosClientes.html')
 }
@@ -165,10 +166,10 @@ getProductosClientes=(req,res)=>{
 getCarritoClientes=(req,res)=>{
     //logr.verbose(req.session);
     const loger=logd.child({modulo:`${modname}[get-carritoClientes]`})
-    let username=req.session.username
+    let username=req.user.username
     //loger.verbose(res,{recurso:"[res]"})
     loger.verbose(username,{recurso:"[reqSessionUsername]"})
-    let web= this.apiAuth.getCarritoClientes()
+    let web= this.apiAuth.getCarritoClientes(username)
     return res.render('carritoClientes.ejs',web)
 }
 
@@ -180,7 +181,7 @@ getCompraExitosa=(req,res)=>{
     //nodemailer(admin,detalles)
     let username=req.user.username
     loger.verbose(username,{recurso:"username"})
-    let web= this.apiAuth.getCompraExitosa()
+    let web= this.apiAuth.getCompraExitosa(username)
     return res.render('compraExitosa',web)
 }
 
@@ -242,24 +243,34 @@ getHomeAdmin=(req,res)=>{
     //logr.verbose(req.session);
     const loger=logd.child({modulo:`${modname}[get-homeAdmin]`})
     let username=req.user.username
+    //let username=this.usernameLocal
     loger.verbose(username,{recurso:"username"})
-    let web= this.apiAuth.getHomeAdmin()
+    let web= this.apiAuth.getHomeAdmin(username)
     return res.render('homeAdmin',web)
 }
 
 getProductosMantenimiento=(req,res)=>{
     //logr.verbose(req.session);
     const loger=logd.child({modulo:`${modname}[get-productosMantenimiento]`})
-    let username=req.session.username
+    let username=req.user.username
     loger.verbose(username,{recurso:"[reqSession.Username]"})
     let web= this.apiAuth.getProductosMantenimiento(username)
     return res.render('productosMantenimiento.ejs',web)
 }
 
+getProveedoresAdmin=(req,res)=>{
+    //logr.verbose(req.session);
+    const loger=logd.child({modulo:`${modname}[get-proveedoresAdmin]`})
+    let username=req.user.username
+    loger.verbose(username,{recurso:"[reqSession.Username]"})
+    let web= this.apiAuth.getProveedoresAdmin(username)
+    return res.render('proveedoresAdmin.ejs',web)
+}
+
 getOperacionesRandoms=(req,res)=>{
     //logr.verbose(req.session);
     const loger=logd.child({modulo:`${modname}[get-operaciones1Admin`})
-    let username=req.session.username
+    let username=req.user.username
     loger.verbose(username,{recurso:"[reqSession.Username]"})
     let web= this.apiAuth.getOperacionesRandoms(username)
     return res.render('operaciones1Admin.ejs',web)
@@ -267,7 +278,7 @@ getOperacionesRandoms=(req,res)=>{
 
 getOperacionesInfo=(req,res)=>{
     //logr.verbose(req.session);
-    let username=req.session.username
+    let username=req.user.username
     let dato1='pruebas'
     let id_proceso=process.pid
     let nombre_plataforma=process.platform
